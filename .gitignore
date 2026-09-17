@@ -1,0 +1,5 @@
+# Datos de los clientes por la ley de protección de datos (RGPD)
+Cliente_*.json
+
+# Archivos generados por Python
+__pycache__/
