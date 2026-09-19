@@ -30,7 +30,7 @@ class Dolencia:
         self.inicio = datetime.strptime(inicio, "%d/%m/%Y").date()
         self.estado = estado
         self.resolucion = resolucion
-        self.observaciones = observaciones if observaciones is None else []
+        self.observaciones = observaciones if observaciones is not None else []
 
     def __repr__(self):
         return f"Dolencia {self.descripcion} - {self.estado}"
@@ -114,6 +114,8 @@ class Cliente:
         if self.dolencias:
             for numero, d in enumerate(self.dolencias, start=1):
                 print(f"{numero} - {d.descripcion} ({d.estado}) - inicio {d.inicio.strftime('%d/%m/%Y')}")
+                for obs in d.observaciones:
+                    print(f"     -{obs['fecha']} - {obs['texto']} ")
         else:
             print("No hay dolencias registradas.")
         
@@ -132,7 +134,18 @@ class Cliente:
         else:
             print("No hay citas registradas.")
 
-    
+    def agregar_observacion_a_dolencia(self, numero, texto):
+        '''Agrega una observación a una dolencia'''
+        indice = numero - 1
+        if 0 <= indice < len(self.dolencias):
+            dolencia = self.dolencias[indice]
+            dolencia.agregar_observacion(texto)
+            # Devuelve True/False para que el el menú gestione el volver a pedir el número de dolencia
+            return True
+        else:
+            print("Índice no encontrado.")
+            return False
+
 
 # ejemplo de uso
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ while True:
     print("4. Ver todas las citas")
     print("5. Agregar dolencia")
     print("6. Resolver dolencia")
-    print("7. Agregar información")
+    print("7. Agregar observación")
     print("8. Resumen del cliente")
     print("9. Listar clientes")
     print("10. Salir del programa")
@@ -94,16 +94,23 @@ while True:
             print("Por favor, introduce un número.")
 
     elif opcion == "7":
-        print("\n--- Agregar información ---")
+        print("\n--- Agregar observación ---")
+        cliente_activo.ver_dolencias()
+        
         texto = input("Introduce la observación: ")
-        cliente_activo.agregar_observacion(texto)
-        repositorio.guardar(cliente_activo)
+        while True:
+            try:
+                numero = int(input("Introduce el número de la dolencia: "))
+                if cliente_activo.agregar_observacion_a_dolencia(numero, texto): # Si devuelve True
+                    repositorio.guardar(cliente_activo)
+                    break
+            except ValueError:
+                print("Por favor, introduce un número.")
 
     elif opcion == "8":
         print("\n--- Resumen del cliente ---")
         cliente_activo.mostrar_info()
         cliente_activo.ver_dolencias()
-        cliente_activo.resumen_clinico()
 
     elif opcion == "9":
         print("\n --- Lista de clientes ---")
