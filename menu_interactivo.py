@@ -10,7 +10,7 @@ from repositorio import RepositorioClientes
 from datetime import date, datetime
 
 cliente_activo = None  # ← se crea una vez, fuera del bucle (variable de estado)
-repositorio = RepositorioClientes()  # creamos el repositorio por defecto
+repositorio = RepositorioClientes("clientes")  # creamos el repositorio por defecto
 
 while True:
     print("\n------ MENÚ ------")

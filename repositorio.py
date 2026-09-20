@@ -10,6 +10,7 @@ from pathlib import Path
 class RepositorioClientes:
     def __init__(self, carpeta="."):  # carpeta actual
         self.carpeta = carpeta
+        Path(self.carpeta).mkdir(exist_ok=True) # crea la carpeta si no existe
 
     def guardar(self, cliente: Cliente):
         """Guarda los datos del cliente en un archivo JSON"""
