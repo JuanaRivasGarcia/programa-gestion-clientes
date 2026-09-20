@@ -1,16 +1,16 @@
-'''
+"""
 Menú para elegir lo que quieres realizar con respecto al cliente
-'''
+"""
 
 # Importamos módulos propios
 from modelos import Cliente
 from repositorio import RepositorioClientes
+
 # Importamos módulos
 from datetime import date, datetime
 
-
-cliente_activo = None   # ← se crea una vez, fuera del bucle (variable de estado)
-repositorio = RepositorioClientes() # creamos el repositorio por defecto
+cliente_activo = None  # ← se crea una vez, fuera del bucle (variable de estado)
+repositorio = RepositorioClientes()  # creamos el repositorio por defecto
 
 while True:
     print("\n------ MENÚ ------")
@@ -31,7 +31,6 @@ while True:
         print("Necesitas crear o cargar un cliente antes de elegir esta opción.")
         continue
 
-
     if opcion == "1":
         print("\n--- Crear cliente ---")
         id_cliente = input("ID del cliente: ")
@@ -39,14 +38,16 @@ while True:
         while True:
             fecha_nacimiento = input("Fecha de nacimiento (DD/MM/AAAA): ")
             try:
-                cliente_activo = Cliente(id_cliente, nombre, fecha_nacimiento) # deja de ser None
-                repositorio.guardar(cliente_activo)   # se guarda en disco al momento
+                cliente_activo = Cliente(
+                    id_cliente, nombre, fecha_nacimiento
+                )  # deja de ser None
+                repositorio.guardar(cliente_activo)  # se guarda en disco al momento
                 print(f"Cliente '{nombre}' creado y guardado con ID {id_cliente}.")
                 break
 
             except ValueError as e:
-                print(e) #muestra el mensaje del raise
-        
+                print(e)  # muestra el mensaje del raise
+
     elif opcion == "2":
         print("\n--- Cargar cliente ---")
         id_cliente = input("Introduce el ID del cliente: ")
@@ -66,8 +67,8 @@ while True:
                 repositorio.guardar(cliente_activo)
                 break
             except ValueError as e:
-                print(e) #muestra el mensaje del raise
-            
+                print(e)  # muestra el mensaje del raise
+
     elif opcion == "4":
         print("\n--- Citas del cliente ---")
         cliente_activo.ver_citas()
@@ -82,13 +83,17 @@ while True:
                 repositorio.guardar(cliente_activo)
                 break
             except ValueError as e:
-                print(e) #muestra el mensaje del raise
+                print(e)  # muestra el mensaje del raise
 
     elif opcion == "6":
         print("\n--- Resolver dolencia ---")
         cliente_activo.ver_dolencias()
         try:
-            numero = int(input("Introduce el número de dolencia que quieres marcar como resuelta: "))
+            numero = int(
+                input(
+                    "Introduce el número de dolencia que quieres marcar como resuelta: "
+                )
+            )
             cliente_activo.resolver_dolencia(numero)
             repositorio.guardar(cliente_activo)
         except ValueError:
@@ -97,12 +102,14 @@ while True:
     elif opcion == "7":
         print("\n--- Agregar observación ---")
         cliente_activo.ver_dolencias()
-        
+
         texto = input("Introduce la observación: ")
         while True:
             try:
                 numero = int(input("Introduce el número de la dolencia: "))
-                if cliente_activo.agregar_observacion_a_dolencia(numero, texto): # Si devuelve True
+                if cliente_activo.agregar_observacion_a_dolencia(
+                    numero, texto
+                ):  # Si devuelve True
                     repositorio.guardar(cliente_activo)
                     break
             except ValueError:
