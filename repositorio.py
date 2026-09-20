@@ -1,5 +1,5 @@
 # Importamos módulos propios
-from clases_clientes import Cliente, Cita, Dolencia
+from modelos import Cliente, Cita, Dolencia
 
 # Importamos módulos
 from datetime import date, datetime

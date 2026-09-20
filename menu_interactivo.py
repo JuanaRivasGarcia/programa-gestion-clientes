@@ -3,7 +3,7 @@ Menú para elegir lo que quieres realizar con respecto al cliente
 '''
 
 # Importamos módulos propios
-from clases_clientes import Cliente
+from modelos import Cliente
 from repositorio import RepositorioClientes
 # Importamos módulos
 from datetime import date, datetime
