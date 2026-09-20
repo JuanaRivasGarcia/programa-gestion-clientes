@@ -5,9 +5,21 @@ from datetime import date, datetime
 
 class Cita:
     def __init__(self, fecha_cita, anotacion):
-        self.fecha_cita = datetime.strptime(fecha_cita, "%d/%m/%Y").date()
+        self.fecha_cita = fecha_cita
         self.anotacion = anotacion
 
+    @property
+    def fecha_cita(self):
+        return self._fecha_cita
+
+    @fecha_cita.setter
+    def fecha_cita(self, valor):
+        try:
+            self._fecha_cita = datetime.strptime(valor, "%d/%m/%Y").date()
+        except ValueError:
+            raise ValueError("Fecha no válida, usa DD/MM/AAAA.")
+
+    
     def __repr__(self):
         return (f"Día ({self.fecha_cita}: '{self.anotacion}')")
 
@@ -27,10 +39,24 @@ class Cita:
 class Dolencia:
     def __init__(self, descripcion, inicio, estado='Activa', resolucion=None, observaciones=None):
         self.descripcion = descripcion
-        self.inicio = datetime.strptime(inicio, "%d/%m/%Y").date()
+        self.inicio = inicio
         self.estado = estado
         self.resolucion = resolucion
         self.observaciones = observaciones if observaciones is not None else []
+
+
+    @property
+    def inicio(self):
+        return self._inicio
+
+    @inicio.setter
+    def inicio(self, valor):
+        try:
+            self._inicio = datetime.strptime(valor, "%d/%m/%Y").date()
+        except ValueError:
+            raise ValueError("Fecha no válida, usa DD/MM/AAAA.")
+
+
 
     def __repr__(self):
         return f"Dolencia {self.descripcion} - {self.estado}"
@@ -66,16 +92,28 @@ class Cliente:
     def __init__(self, id_cliente, nombre, nacimiento, dolencias=None, citas=None):
         self.id_cliente = id_cliente
         self.nombre = nombre.title()
-        self.nacimiento = datetime.strptime(nacimiento, "%d/%m/%Y").date()
+        self.nacimiento = nacimiento
         self.dolencias = dolencias if dolencias is not None else []
         self.citas = citas if citas is not None else []
+
+
+    @property
+    def nacimiento(self):
+        return self._nacimiento
+
+    @nacimiento.setter
+    def nacimiento(self, valor):
+        try:
+            self._nacimiento = datetime.strptime(valor, "%d/%m/%Y").date()
+        except ValueError:
+            raise ValueError("Fecha no válida, usa DD/MM/AAAA.")
+        
 
     def __repr__(self):
         return (f"Cliente {self.id_cliente}: {self.nombre}")
 
     def mostrar_info(self):
         '''Muestra toda la informacion del cliente'''
-        print(f"\nINFORMACIÓN CLIENTE {self.nombre.upper()}")
         print(f"ID: {self.id_cliente}")
         print(f"Nombre: {self.nombre}")
         print(f"Nacimiento: {self.nacimiento.strftime('%d/%m/%Y')} ({self.edad} años)")
@@ -110,7 +148,6 @@ class Cliente:
 
     def ver_dolencias(self):
         '''Muestra las dolencias del cliente y el estado'''
-        print("\n--- Dolencias del cliente ---")
         if self.dolencias:
             for numero, d in enumerate(self.dolencias, start=1):
                 print(f"{numero} - {d.descripcion} ({d.estado}) - inicio {d.inicio.strftime('%d/%m/%Y')}")
@@ -127,7 +164,6 @@ class Cliente:
 
     def ver_citas(self):
         '''Muestra las fechas y anotaciones de las citas'''
-        print("\n--- Citas del cliente ---")
         if self.citas:
             for numero, cita in enumerate(self.citas, start=1):
                 print(f"{numero}: {cita.fecha_cita.strftime('%d/%m/%Y')} - {cita.anotacion}")

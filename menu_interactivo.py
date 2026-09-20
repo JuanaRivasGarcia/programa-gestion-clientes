@@ -44,8 +44,8 @@ while True:
                 print(f"Cliente '{nombre}' creado y guardado con ID {id_cliente}.")
                 break
 
-            except ValueError:
-                print("Fecha incorrecta. Por favor, introduce en el formato DD/MM/AAAA.")
+            except ValueError as e:
+                print(e) #muestra el mensaje del raise
         
     elif opcion == "2":
         print("\n--- Cargar cliente ---")
@@ -65,10 +65,11 @@ while True:
                 cliente_activo.agregar_cita(fecha, anotacion)
                 repositorio.guardar(cliente_activo)
                 break
-            except ValueError:
-                print("Formato de fecha incorrecto.")
+            except ValueError as e:
+                print(e) #muestra el mensaje del raise
             
     elif opcion == "4":
+        print("\n--- Citas del cliente ---")
         cliente_activo.ver_citas()
 
     elif opcion == "5":
@@ -80,8 +81,8 @@ while True:
                 cliente_activo.agregar_dolencia(descripcion, inicio)
                 repositorio.guardar(cliente_activo)
                 break
-            except ValueError:
-                print("Formato de fecha incorrecto.")
+            except ValueError as e:
+                print(e) #muestra el mensaje del raise
 
     elif opcion == "6":
         print("\n--- Resolver dolencia ---")
