@@ -132,28 +132,6 @@ class Cliente:
         print(f"Dolencias registradas: {len(self.dolencias)}")
         print(f"Total citas: {len(self.citas)}")
 
-    def ver_dolencias(self):
-        """Muestra las dolencias del cliente y el estado"""
-        if self.dolencias:
-            for numero, d in enumerate(self.dolencias, start=1):
-                print(
-                    f"{numero} - {d.descripcion} ({d.estado}) - inicio {d.inicio.strftime('%d/%m/%Y')}"
-                )
-                for obs in d.observaciones:
-                    print(f"     -{obs['fecha']} - {obs['texto']} ")
-        else:
-            print("No hay dolencias registradas.")
-
-    def ver_citas(self):
-        """Muestra las fechas y anotaciones de las citas"""
-        if self.citas:
-            for numero, cita in enumerate(self.citas, start=1):
-                print(
-                    f"{numero}: {cita.fecha_cita.strftime('%d/%m/%Y')} - {cita.anotacion}"
-                )
-        else:
-            print("No hay citas registradas.")
-
     # ----- Acciones sobre las citas -----
     def agregar_cita(self, fecha_cita, anotacion):
         """Añade cita al cliente"""
@@ -166,7 +144,6 @@ class Cliente:
         """Añade nueva dolencia"""
         nueva_dolencia = Dolencia(descripcion, inicio)
         self.dolencias.append(nueva_dolencia)
-        print("Dolencia agregada correctamente.")
 
     def resolver_dolencia(self, numero):
         """Cambia el estado de la dolencia activa/resuelta."""
