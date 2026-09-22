@@ -150,11 +150,13 @@ class Cliente:
         indice = numero - 1
         if 0 <= indice < len(self.dolencias):
             dolencia = self.dolencias[indice]
-            dolencia.estado = "Resuelta"
+            if dolencia.estado == "Resuelta": #ya estaba resuelta
+                return "ya resuelta"
+            dolencia.estado = "Resuelta" # se acaba de resolver
             dolencia.resolucion = date.today().strftime("%d/%m/%Y")
-            print(f"La dolencia {dolencia.descripcion} se ha guardado como resuelta.")
+            return "resuelta"
         else:
-            print("No se ha encontrado el número de la dolencia.")
+            return "no encontrada" # no se ha encontrado el número
 
     def agregar_observacion_a_dolencia(self, numero, texto):
         """Agrega una observación a una dolencia"""

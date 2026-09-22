@@ -101,6 +101,23 @@ def agregar_dolencia(cliente_activo, repositorio):
         except ValueError as e:
             print(e)  # muestra el mensaje del raise
 
+def resolver_dolencia(cliente_activo, repositorio):
+    '''Marca en estado resuelta una dolencia'''
+    if not ver_dolencias(cliente_activo): # Si el cliente no tiene dolencias(False)
+        return
+    try:
+        numero = int(input("Introduce el número de dolencia que quieres marcar como resuelta: "))
+        resultado = cliente_activo.resolver_dolencia(numero) # Si devuelve True
+        if resultado == "resuelta":
+            repositorio.guardar(cliente_activo)
+            print("La dolencia se ha resuelto correctamente.")
+        elif resultado == "ya resuelta":
+            print("La dolencia ya estaba anteriormente resuelta.")
+        else:
+            print("No se ha encontrado la dolencia")
+    except ValueError:
+        print("Por favor, introduce un número.")
+
 cliente_activo = None  # ← se crea una vez, fuera del bucle (variable de estado)
 repositorio = RepositorioClientes("clientes")  # creamos el repositorio por defecto
 
@@ -142,19 +159,7 @@ while True:
         agregar_dolencia(cliente_activo, repositorio)
 
     elif opcion == "6":
-        if not ver_dolencias(cliente_activo): # Si el cliente no tiene dolencias(False)
-            continue
-
-        try:
-            numero = int(
-                input(
-                    "Introduce el número de dolencia que quieres marcar como resuelta: "
-                )
-            )
-            cliente_activo.resolver_dolencia(numero)
-            repositorio.guardar(cliente_activo)
-        except ValueError:
-            print("Por favor, introduce un número.")
+        resolver_dolencia(cliente_activo, repositorio)
 
     elif opcion == "7":
         if not ver_dolencias(cliente_activo): # Si el cliente no tiene dolencias(False)
