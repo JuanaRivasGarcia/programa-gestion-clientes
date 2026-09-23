@@ -31,7 +31,6 @@ def crear_cliente(repositorio):
             repositorio.guardar(nuevo_cliente)  # se guarda en disco al momento
             print(f"Cliente '{nombre}' creado y guardado con ID '{id_cliente}'.")
             return nuevo_cliente # devuelve el cliente que se ha creado
-    
         except ValueError as e:
             print(e)  # muestra el mensaje del raise
 
@@ -68,7 +67,6 @@ def ver_dolencias(cliente_activo):
             for obs in d.observaciones:
                 print(f"     -{obs['fecha']} - {obs['texto']} ")
         return True
-    
     else:
         print(f"El cliente {cliente_activo.nombre} no tiene dolencias asociadas.")
         return False
@@ -97,7 +95,6 @@ def agregar_dolencia(cliente_activo, repositorio):
             repositorio.guardar(cliente_activo)
             print(f"Dolencia añadida a '{cliente_activo.nombre}' correctamente.")
             break
-
         except ValueError as e:
             print(e)  # muestra el mensaje del raise
 
@@ -118,9 +115,53 @@ def resolver_dolencia(cliente_activo, repositorio):
     except ValueError:
         print("Por favor, introduce un número.")
 
+def agregar_observacion(cliente_activo, repositorio):
+    '''Añade una nueva observación a una dolencia'''
+    if not ver_dolencias(cliente_activo): # Muestra y comprueba
+        return
+    texto = input("Introduce la observación: ")
+    while True:
+        try:
+            numero = int(input("Introduce el número de la dolencia: "))
+            if cliente_activo.agregar_observacion_a_dolencia(numero, texto):  # Si devuelve True
+                repositorio.guardar(cliente_activo)
+                print(f"Observación agregada correctamente al cliente '{cliente_activo.nombre}'.")
+                break
+            else:
+                print("No se ha encontrado la dolencia.")
+        except ValueError:
+            print("Por favor, introduce un número.")
+
+def mostrar_info(cliente_activo):
+    '''Muestra información general del cliente'''
+    cabecera(f"Información de '{cliente_activo.nombre}'")
+    print(f"ID: {cliente_activo.id_cliente}")
+    print(f"Nombre: {cliente_activo.nombre}")
+    print(f"Nacimiento: {cliente_activo.nacimiento.strftime('%d/%m/%Y')} ({cliente_activo.edad} años)")
+    print(f"Dolencias registradas: {len(cliente_activo.dolencias)}")
+    print(f"Total citas: {len(cliente_activo.citas)}")
+
+def resumen(cliente_activo):
+    '''Muestra la ficha completa del cliente'''
+    mostrar_info(cliente_activo)
+    ver_dolencias(cliente_activo)
+    ver_citas(cliente_activo)
+
+def listar_clientes(repositorio):
+    '''Muestra ID y nombre de cada cliente'''
+    cabecera("lista de clientes")
+    clientes = repositorio.listar_clientes()
+    if clientes:
+        for c in clientes:
+            print(f"ID: {c['id_cliente']} / Nombre: {c['nombre']}")
+    else:
+        print("Aún no hay clientes registrados.")
+
+
 cliente_activo = None  # ← se crea una vez, fuera del bucle (variable de estado)
 repositorio = RepositorioClientes("clientes")  # creamos el repositorio por defecto
 
+# ----- Menú
 while True:
     print("\n------ MENÚ ------")
     print("1. Crear cliente")
@@ -162,32 +203,13 @@ while True:
         resolver_dolencia(cliente_activo, repositorio)
 
     elif opcion == "7":
-        if not ver_dolencias(cliente_activo): # Si el cliente no tiene dolencias(False)
-            continue
-
-        texto = input("Introduce la observación: ")
-        while True:
-            try:
-                numero = int(input("Introduce el número de la dolencia: "))
-                if cliente_activo.agregar_observacion_a_dolencia(
-                    numero, texto
-                ):  # Si devuelve True
-                    repositorio.guardar(cliente_activo)
-                    break
-            except ValueError:
-                print("Por favor, introduce un número.")
+        agregar_observacion(cliente_activo, repositorio)
 
     elif opcion == "8":
-        cliente_activo.mostrar_info()
-        ver_dolencias(cliente_activo)
+        resumen(cliente_activo)
 
     elif opcion == "9":
-        clientes = repositorio.listar_clientes()
-        if clientes:
-            for c in clientes:
-                print(f"ID: {c['id_cliente']} / Nombre: {c['nombre']}")
-        else:
-            print("Aún no hay clientes registrados.")
+        listar_clientes(repositorio)
 
     elif opcion == "10":
         print("\nSaliendo del programa...")
@@ -195,8 +217,3 @@ while True:
 
     else:
         print("\nPor favor, introduce una opción válida.")
-
-
-
-if __name__ == "__main__":
-    cabecera = cabecera("Crear cliente")

@@ -88,7 +88,6 @@ class Dolencia:
             "texto": texto,
         }
         self.observaciones.append(observacion)
-        print("Observación agregada correctamente.")
 
 
 class Cliente:
@@ -122,15 +121,6 @@ class Cliente:
         if (hoy.month, hoy.day) < (self.nacimiento.month, self.nacimiento.day):
             edad -= 1
         return edad
-
-    # ----- Presentación -----
-    def mostrar_info(self):
-        """Muestra toda la informacion del cliente"""
-        print(f"ID: {self.id_cliente}")
-        print(f"Nombre: {self.nombre}")
-        print(f"Nacimiento: {self.nacimiento.strftime('%d/%m/%Y')} ({self.edad} años)")
-        print(f"Dolencias registradas: {len(self.dolencias)}")
-        print(f"Total citas: {len(self.citas)}")
 
     # ----- Acciones sobre las citas -----
     def agregar_cita(self, fecha_cita, anotacion):
@@ -167,7 +157,6 @@ class Cliente:
             # Devuelve True/False para que el menú gestione el volver a pedir el número de dolencia
             return True
         else:
-            print("Índice no encontrado.")
             return False
 
 
