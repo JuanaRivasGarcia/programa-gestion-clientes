@@ -2,7 +2,6 @@
 from modelos import Cliente, Cita, Dolencia
 
 # Importamos módulos
-from datetime import date, datetime
 import json
 from pathlib import Path
 
@@ -64,3 +63,8 @@ class RepositorioClientes:
                 }
             )
         return clientes
+
+    def existe_cliente(self, id_cliente):
+        '''Devuelve True si ya hay un cliente con dicho ID'''
+        nombre_archivo = f"{self.carpeta}/Cliente_{id_cliente}.json"
+        return Path(nombre_archivo).exists() # ¿hay un archivo real en esa ruta?

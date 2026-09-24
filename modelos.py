@@ -127,7 +127,6 @@ class Cliente:
         """Añade cita al cliente"""
         nueva_cita = Cita(fecha_cita, anotacion)
         self.citas.append(nueva_cita)
-        print(f"Cita del día '{fecha_cita}' agregada correctamente.")
 
     # ----- Acciones sobre dolencias -----
     def agregar_dolencia(self, descripcion, inicio):

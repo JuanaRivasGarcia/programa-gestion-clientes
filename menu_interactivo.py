@@ -7,7 +7,7 @@ from modelos import Cliente
 from repositorio import RepositorioClientes
 
 # Importamos módulos
-from datetime import date, datetime
+from pathlib import Path
 
 # ---Funciones para el menú
 def cabecera(titulo):
@@ -21,6 +21,9 @@ def crear_cliente(repositorio):
     '''Crea un cliente y lo guarda en el repositorio'''
     cabecera("crear cliente")
     id_cliente = input("ID del cliente: ")
+    if repositorio.existe_cliente(id_cliente):  # si ya existe
+        print(f"Ya existe un cliente con el ID {id_cliente}. No se ha creado nada.")
+        return None  # no se crea nada
     nombre = input("Nombre: ")
     while True:
         fecha_nacimiento = input("Fecha de nacimiento (DD/MM/AAAA): ")
@@ -80,6 +83,7 @@ def agregar_cita(cliente_activo, repositorio):
         try:
             cliente_activo.agregar_cita(fecha, anotacion)
             repositorio.guardar(cliente_activo)
+            print(f"Cita para '{cliente_activo.nombre}' agregada correctamente.")
             break
         except ValueError as e:
             print(e)  # muestra el mensaje del raise
@@ -157,63 +161,73 @@ def listar_clientes(repositorio):
     else:
         print("Aún no hay clientes registrados.")
 
+def main():
+    '''Ejecuta el menú interactivo'''
+    cliente_activo = None  # ← se crea una vez, fuera del bucle (variable de estado)
+    # __file__:ruta del archivo actual
+    # .parent: la carpeta que lo contiene
+    # /"clientes": operador de unión de rutas en pathlib
+    carpeta_clientes = Path(__file__).parent / "clientes" 
+    repositorio = RepositorioClientes(carpeta_clientes)  # repositorio que guarda en la carpeta clientes
 
-cliente_activo = None  # ← se crea una vez, fuera del bucle (variable de estado)
-repositorio = RepositorioClientes("clientes")  # creamos el repositorio por defecto
+    # ----- Menú
+    while True:
+        print("\n------ MENÚ ------")
+        print("1. Crear cliente")
+        print("2. Cargar cliente")
+        print("3. Agregar cita")
+        print("4. Ver todas las citas")
+        print("5. Agregar dolencia")
+        print("6. Resolver dolencia")
+        print("7. Agregar observación")
+        print("8. Resumen del cliente")
+        print("9. Listar clientes")
+        print("10. Salir del programa")
+        opcion = input("Introduce la opción que deseas elegir: ")
 
-# ----- Menú
-while True:
-    print("\n------ MENÚ ------")
-    print("1. Crear cliente")
-    print("2. Cargar cliente")
-    print("3. Agregar cita")
-    print("4. Ver todas las citas")
-    print("5. Agregar dolencia")
-    print("6. Resolver dolencia")
-    print("7. Agregar observación")
-    print("8. Resumen del cliente")
-    print("9. Listar clientes")
-    print("10. Salir del programa")
-    opcion = input("Introduce la opción que deseas elegir: ")
+        # Verificamos que haya cliente para las opciones 3 al 8
+        if opcion in ["3", "4", "5", "6", "7", "8"] and cliente_activo is None:
+            print("Necesitas crear o cargar un cliente antes de elegir esta opción.")
+            continue
 
-    # Verificamos que haya cliente para las opciones 3 al 8
-    if opcion in ["3", "4", "5", "6", "7", "8"] and cliente_activo is None:
-        print("Necesitas crear o cargar un cliente antes de elegir esta opción.")
-        continue
+        if opcion == "1":
+            resultado = crear_cliente(repositorio)
+            if resultado is not None:
+                cliente_activo = resultado
 
-    if opcion == "1":
-        cliente_activo = crear_cliente(repositorio)
+        elif opcion == "2":
+            resultado = cargar_cliente(repositorio)
+            if resultado is not None:
+                cliente_activo = resultado
+            # Si devuelve None no se modifica nada y sigue manteniendo el cliente activo anterior
 
-    elif opcion == "2":
-        resultado = cargar_cliente(repositorio)
-        if resultado is not None:
-            cliente_activo = resultado
-        # Si devuelve None no se modifica nada y sigue manteniendo el cliente activo anterior
+        elif opcion == "3":
+            agregar_cita(cliente_activo, repositorio)
 
-    elif opcion == "3":
-        agregar_cita(cliente_activo, repositorio)
+        elif opcion == "4":
+            ver_citas(cliente_activo)
 
-    elif opcion == "4":
-        ver_citas(cliente_activo)
+        elif opcion == "5":
+            agregar_dolencia(cliente_activo, repositorio)
 
-    elif opcion == "5":
-        agregar_dolencia(cliente_activo, repositorio)
+        elif opcion == "6":
+            resolver_dolencia(cliente_activo, repositorio)
 
-    elif opcion == "6":
-        resolver_dolencia(cliente_activo, repositorio)
+        elif opcion == "7":
+            agregar_observacion(cliente_activo, repositorio)
 
-    elif opcion == "7":
-        agregar_observacion(cliente_activo, repositorio)
+        elif opcion == "8":
+            resumen(cliente_activo)
 
-    elif opcion == "8":
-        resumen(cliente_activo)
+        elif opcion == "9":
+            listar_clientes(repositorio)
 
-    elif opcion == "9":
-        listar_clientes(repositorio)
+        elif opcion == "10":
+            print("\nSaliendo del programa...")
+            break
 
-    elif opcion == "10":
-        print("\nSaliendo del programa...")
-        break
+        else:
+            print("\nPor favor, introduce una opción válida.")
 
-    else:
-        print("\nPor favor, introduce una opción válida.")
+if __name__ == "__main__":
+    main()
