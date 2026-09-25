@@ -21,6 +21,10 @@ def crear_cliente(repositorio):
     '''Crea un cliente y lo guarda en el repositorio'''
     cabecera("crear cliente")
     id_cliente = input("ID del cliente: ")
+    if not id_cliente.isalnum(): # isalnum() devuelve True si el string solo tiene letras y nºs
+        print("El ID solo puede contener letras y números.")
+        return None
+
     if repositorio.existe_cliente(id_cliente):  # si ya existe
         print(f"Ya existe un cliente con el ID {id_cliente}. No se ha creado nada.")
         return None  # no se crea nada
@@ -41,13 +45,13 @@ def cargar_cliente(repositorio):
     '''Carga la información del cliente solicitado'''
     cabecera("cargar cliente")
     id_cliente = input("Introduce el ID del cliente: ")
-    try:
-        cliente = repositorio.cargar(id_cliente)
+    cliente = repositorio.cargar(id_cliente)
+    if cliente is not None:
         print(f"Cliente '{cliente.nombre}' con ID '{id_cliente}' cargado correctamente.")
         return cliente
-    except FileNotFoundError:
-        print(f"No se ha encontrado ningún cliente con el ID {id_cliente}.")
-        return None #devuelve None si no encuentra el ID del cliente
+    else:
+        print(f"No se ha encontrado ningún cliente con el ID {id_cliente} o el archivo está dañado.")
+        return None
 
 def ver_citas(cliente_activo):
     '''Muestra las citas del cliente'''

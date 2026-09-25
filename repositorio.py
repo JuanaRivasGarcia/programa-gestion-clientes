@@ -30,20 +30,23 @@ class RepositorioClientes:
     def cargar(self, id_cliente):
         """Carga un cliente desde el JSON y reconstruye el objeto"""
         nombre_archivo = f"{self.carpeta}/Cliente_{id_cliente}.json"
-        with open(nombre_archivo, "r", encoding="utf-8") as file:
-            datos = json.load(file)  # json.load devuelve un diccionario
-
-        # creamos el objeto Cliente con los valores sacados del dict 'datos'
-        cliente = Cliente(
-            id_cliente=datos["id_cliente"],
-            nombre=datos["nombre"],
-            nacimiento=datos["nacimiento"],
-            # Desserialización de Dolencias y Citas
-            dolencias=[Dolencia.a_objeto(dic) for dic in datos["dolencias"]],
-            citas=[Cita.a_objeto(dic) for dic in datos["citas"]],
-        )
-
-        return cliente
+        try:
+            with open(nombre_archivo, "r", encoding="utf-8") as file:
+                datos = json.load(file)  # json.load devuelve un diccionario
+            # creamos el objeto Cliente con los valores sacados del dict 'datos'
+            cliente = Cliente(
+                        id_cliente=datos["id_cliente"],
+                        nombre=datos["nombre"],
+                        nacimiento=datos["nacimiento"],
+                        # Desserialización de Dolencias y Citas
+                        dolencias=[Dolencia.a_objeto(dic) for dic in datos["dolencias"]],
+                        citas=[Cita.a_objeto(dic) for dic in datos["citas"]],
+                            )
+            return cliente
+                 
+        except(FileNotFoundError, ValueError, KeyError, json.JSONDecodeError):
+            #El archivo no existe o está dañado
+            return None
 
     # NOTA: este método recorre los archivos JSON para listar a los clientes.
     # Es válido para pocos registros pero a una mayor escala es ineficiente abrir cada archivo
@@ -54,15 +57,19 @@ class RepositorioClientes:
         clientes = []
         # .glob para buscar archivos con el patrón "Cliente_*.json"
         for archivo in Path(self.carpeta).glob("Cliente_*.json"):
-            with open(archivo, "r", encoding="utf-8") as file:
-                datos = json.load(file)
-            clientes.append(
-                {
+            try:
+                with open(archivo, "r", encoding="utf-8") as file:
+                    datos = json.load(file)
+                clientes.append(
+                    {
                     "id_cliente": datos["id_cliente"],
                     "nombre": datos["nombre"],
-                }
-            )
+                    }
+                    )
+            except (json.JSONDecodeError, ValueError, KeyError):
+                continue
         return clientes
+        
 
     def existe_cliente(self, id_cliente):
         '''Devuelve True si ya hay un cliente con dicho ID'''
