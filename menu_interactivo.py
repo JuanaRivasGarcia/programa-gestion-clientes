@@ -9,19 +9,23 @@ from repositorio import RepositorioClientes
 # Importamos módulos
 from pathlib import Path
 
+
 # ---Funciones para el menú
 def cabecera(titulo):
-    '''Crea la misma cabecera para cada opción del menú'''
+    """Crea la misma cabecera para cada opción del menú"""
     print()
     print("=" * len(titulo))
     print(f"{titulo.upper()}")
     print("=" * len(titulo))
 
+
 def crear_cliente(repositorio):
-    '''Crea un cliente y lo guarda en el repositorio'''
+    """Crea un cliente y lo guarda en el repositorio"""
     cabecera("crear cliente")
     id_cliente = input("ID del cliente: ")
-    if not id_cliente.isalnum(): # isalnum() devuelve True si el string solo tiene letras y nºs
+    if (
+        not id_cliente.isalnum()
+    ):  # isalnum() devuelve True si el string solo tiene letras y nºs
         print("El ID solo puede contener letras y números.")
         return None
 
@@ -34,43 +38,51 @@ def crear_cliente(repositorio):
         try:
             nuevo_cliente = Cliente(
                 id_cliente, nombre, fecha_nacimiento
-                )  # deja de ser None
+            )  # deja de ser None
             repositorio.guardar(nuevo_cliente)  # se guarda en disco al momento
             print(f"Cliente '{nombre}' creado y guardado con ID '{id_cliente}'.")
-            return nuevo_cliente # devuelve el cliente que se ha creado
+            return nuevo_cliente  # devuelve el cliente que se ha creado
         except ValueError as e:
             print(e)  # muestra el mensaje del raise
 
+
 def cargar_cliente(repositorio):
-    '''Carga la información del cliente solicitado'''
+    """Carga la información del cliente solicitado"""
     cabecera("cargar cliente")
     id_cliente = input("Introduce el ID del cliente: ")
     cliente = repositorio.cargar(id_cliente)
     if cliente is not None:
-        print(f"Cliente '{cliente.nombre}' con ID '{id_cliente}' cargado correctamente.")
+        print(
+            f"Cliente '{cliente.nombre}' con ID '{id_cliente}' cargado correctamente."
+        )
         return cliente
     else:
-        print(f"No se ha encontrado ningún cliente con el ID {id_cliente} o el archivo está dañado.")
+        print(
+            f"No se ha encontrado ningún cliente con el ID {id_cliente} o el archivo está dañado."
+        )
         return None
 
+
 def ver_citas(cliente_activo):
-    '''Muestra las citas del cliente'''
+    """Muestra las citas del cliente"""
     cabecera("citas del cliente")
     if cliente_activo.citas:
         for numero, cita in enumerate(cliente_activo.citas, start=1):
             print(
                 f"{numero}: {cita.fecha_cita.strftime('%d/%m/%Y')} - {cita.anotacion}"
-                )
+            )
     else:
         print(f"El cliente '{cliente_activo.nombre}' no tiene citas registradas.")
 
+
 def ver_dolencias(cliente_activo):
-    '''Muestra las dolencias del cliente y el estado'''
+    """Muestra las dolencias del cliente y el estado"""
     cabecera("dolencias del cliente")
     if cliente_activo.dolencias:
         for numero, d in enumerate(cliente_activo.dolencias, start=1):
-            print(f"{numero}: {d.descripcion} ({d.estado}) - inicio {d.inicio.strftime('%d/%m/%Y')}"
-                  )
+            print(
+                f"{numero}: {d.descripcion} ({d.estado}) - inicio {d.inicio.strftime('%d/%m/%Y')}"
+            )
             for obs in d.observaciones:
                 print(f"     -{obs['fecha']} - {obs['texto']} ")
         return True
@@ -78,8 +90,9 @@ def ver_dolencias(cliente_activo):
         print(f"El cliente {cliente_activo.nombre} no tiene dolencias asociadas.")
         return False
 
+
 def agregar_cita(cliente_activo, repositorio):
-    '''Añade una nueva cita al cliente'''
+    """Añade una nueva cita al cliente"""
     cabecera("agregar cita")
     anotacion = input("Nota sobre la cita: ")
     while True:
@@ -92,12 +105,15 @@ def agregar_cita(cliente_activo, repositorio):
         except ValueError as e:
             print(e)  # muestra el mensaje del raise
 
+
 def agregar_dolencia(cliente_activo, repositorio):
-    '''Añade una dolencia al cliente'''
+    """Añade una dolencia al cliente"""
     cabecera("agregar dolencia")
     descripcion = input("Introduce la dolencia del cliente: ")
     while True:
-        inicio = input("Introduce el día aproximado que empezó la dolencia(DD/MM/AAAA): ")
+        inicio = input(
+            "Introduce el día aproximado que empezó la dolencia(DD/MM/AAAA): "
+        )
         try:
             cliente_activo.agregar_dolencia(descripcion, inicio)
             repositorio.guardar(cliente_activo)
@@ -106,13 +122,16 @@ def agregar_dolencia(cliente_activo, repositorio):
         except ValueError as e:
             print(e)  # muestra el mensaje del raise
 
+
 def resolver_dolencia(cliente_activo, repositorio):
-    '''Marca en estado resuelta una dolencia'''
-    if not ver_dolencias(cliente_activo): # Si el cliente no tiene dolencias(False)
+    """Marca en estado resuelta una dolencia"""
+    if not ver_dolencias(cliente_activo):  # Si el cliente no tiene dolencias(False)
         return
     try:
-        numero = int(input("Introduce el número de dolencia que quieres marcar como resuelta: "))
-        resultado = cliente_activo.resolver_dolencia(numero) # Si devuelve True
+        numero = int(
+            input("Introduce el número de dolencia que quieres marcar como resuelta: ")
+        )
+        resultado = cliente_activo.resolver_dolencia(numero)  # Si devuelve True
         if resultado == "resuelta":
             repositorio.guardar(cliente_activo)
             print("La dolencia se ha resuelto correctamente.")
@@ -123,40 +142,50 @@ def resolver_dolencia(cliente_activo, repositorio):
     except ValueError:
         print("Por favor, introduce un número.")
 
+
 def agregar_observacion(cliente_activo, repositorio):
-    '''Añade una nueva observación a una dolencia'''
-    if not ver_dolencias(cliente_activo): # Muestra y comprueba
+    """Añade una nueva observación a una dolencia"""
+    if not ver_dolencias(cliente_activo):  # Muestra y comprueba
         return
     texto = input("Introduce la observación: ")
     while True:
         try:
             numero = int(input("Introduce el número de la dolencia: "))
-            if cliente_activo.agregar_observacion_a_dolencia(numero, texto):  # Si devuelve True
+            if cliente_activo.agregar_observacion_a_dolencia(
+                numero, texto
+            ):  # Si devuelve True
                 repositorio.guardar(cliente_activo)
-                print(f"Observación agregada correctamente al cliente '{cliente_activo.nombre}'.")
+                print(
+                    f"Observación agregada correctamente al cliente '{cliente_activo.nombre}'."
+                )
                 break
             else:
                 print("No se ha encontrado la dolencia.")
         except ValueError:
             print("Por favor, introduce un número.")
 
+
 def mostrar_info(cliente_activo):
-    '''Muestra información general del cliente'''
+    """Muestra información general del cliente"""
     cabecera(f"Información de '{cliente_activo.nombre}'")
     print(f"ID: {cliente_activo.id_cliente}")
     print(f"Nombre: {cliente_activo.nombre}")
-    print(f"Nacimiento: {cliente_activo.nacimiento.strftime('%d/%m/%Y')} ({cliente_activo.edad} años)")
+    print(
+        f"Nacimiento: {cliente_activo.nacimiento.strftime('%d/%m/%Y')} ({cliente_activo.edad} años)"
+    )
     print(f"Dolencias registradas: {len(cliente_activo.dolencias)}")
     print(f"Total citas: {len(cliente_activo.citas)}")
 
+
 def resumen(cliente_activo):
-    '''Muestra la ficha completa del cliente'''
+    """Muestra la ficha completa del cliente"""
     mostrar_info(cliente_activo)
     ver_dolencias(cliente_activo)
     ver_citas(cliente_activo)
 
+
 def listar_clientes(repositorio):
-    '''Muestra ID y nombre de cada cliente'''
+    """Muestra ID y nombre de cada cliente"""
     cabecera("lista de clientes")
     clientes = repositorio.listar_clientes()
     if clientes:
@@ -165,14 +194,17 @@ def listar_clientes(repositorio):
     else:
         print("Aún no hay clientes registrados.")
 
+
 def main():
-    '''Ejecuta el menú interactivo'''
+    """Ejecuta el menú interactivo"""
     cliente_activo = None  # ← se crea una vez, fuera del bucle (variable de estado)
     # __file__:ruta del archivo actual
     # .parent: la carpeta que lo contiene
     # /"clientes": operador de unión de rutas en pathlib
-    carpeta_clientes = Path(__file__).parent / "clientes" 
-    repositorio = RepositorioClientes(carpeta_clientes)  # repositorio que guarda en la carpeta clientes
+    carpeta_clientes = Path(__file__).parent / "clientes"
+    repositorio = RepositorioClientes(
+        carpeta_clientes
+    )  # repositorio que guarda en la carpeta clientes
 
     # ----- Menú
     while True:
@@ -232,6 +264,7 @@ def main():
 
         else:
             print("\nPor favor, introduce una opción válida.")
+
 
 if __name__ == "__main__":
     main()

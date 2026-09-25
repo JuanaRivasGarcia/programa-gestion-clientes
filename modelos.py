@@ -139,13 +139,13 @@ class Cliente:
         indice = numero - 1
         if 0 <= indice < len(self.dolencias):
             dolencia = self.dolencias[indice]
-            if dolencia.estado == "Resuelta": #ya estaba resuelta
+            if dolencia.estado == "Resuelta":  # ya estaba resuelta
                 return "ya resuelta"
-            dolencia.estado = "Resuelta" # se acaba de resolver
+            dolencia.estado = "Resuelta"  # se acaba de resolver
             dolencia.resolucion = date.today().strftime("%d/%m/%Y")
             return "resuelta"
         else:
-            return "no encontrada" # no se ha encontrado el número
+            return "no encontrada"  # no se ha encontrado el número
 
     def agregar_observacion_a_dolencia(self, numero, texto):
         """Agrega una observación a una dolencia"""
@@ -161,33 +161,4 @@ class Cliente:
 
 # ejemplo de uso
 if __name__ == "__main__":
-    cliente = Cliente("123", "juana rivas", "20/03/1988", ["tendinitis hombro"])
-    # cliente.mostrar_info()
-    # cliente.agregar_dolencia('otitis')
-    # cliente.mostrar_info()
-    # cliente.eliminar_dolencia("tendinitis hombro")
-    # cliente.agregar_cita('04/05/2026')
-    # cliente.agregar_cita('25/06/2026')
-    # cliente.agregar_cita('03/07/2026')
-    # cliente.mostrar_info()
-    # ultima_cita = cliente.ultima_cita()
-    # print(ultima_cita)
-    # todas_citas = cliente.total_citas()
-    # print(todas_citas)
-    # cliente.agregar_observacion("Hombro totalmente recuperado.")
-    # cliente_cargado = Cliente.cargar_json("123")
-    # cliente_cargado.mostrar_info()
-    # cliente.resumen_clinico()
-    # cita = Cita("17/08/2026", "Trabajamos hombro")
-    # print(cita)
-    # cliente.agregar_cita("17/08/2026", "Trabajamos hombro")
-    # cliente_cargado = Cliente.cargar_json("123")
-    # print(cliente_cargado.citas)
-    # print(cliente_cargado.citas[0].anotacion)
-    dolencia = Dolencia("Tortícolis lado derecho del cuello", "20/08/2026")
-    print(dolencia)
-    dic = dolencia.a_diccionario()
-    print(dic)
-    dic_2 = dolencia.a_objeto(dic)
-    print(dic_2)
-    print(dic_2.inicio)
+    pass

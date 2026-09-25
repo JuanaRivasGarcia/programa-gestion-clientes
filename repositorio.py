@@ -9,7 +9,7 @@ from pathlib import Path
 class RepositorioClientes:
     def __init__(self, carpeta="."):  # carpeta actual
         self.carpeta = carpeta
-        Path(self.carpeta).mkdir(exist_ok=True) # crea la carpeta si no existe
+        Path(self.carpeta).mkdir(exist_ok=True)  # crea la carpeta si no existe
 
     def guardar(self, cliente: Cliente):
         """Guarda los datos del cliente en un archivo JSON"""
@@ -35,17 +35,23 @@ class RepositorioClientes:
                 datos = json.load(file)  # json.load devuelve un diccionario
             # creamos el objeto Cliente con los valores sacados del dict 'datos'
             cliente = Cliente(
-                        id_cliente=datos["id_cliente"],
-                        nombre=datos["nombre"],
-                        nacimiento=datos["nacimiento"],
-                        # Desserialización de Dolencias y Citas
-                        dolencias=[Dolencia.a_objeto(dic) for dic in datos["dolencias"]],
-                        citas=[Cita.a_objeto(dic) for dic in datos["citas"]],
-                            )
+                id_cliente=datos["id_cliente"],
+                nombre=datos["nombre"],
+                nacimiento=datos["nacimiento"],
+                # Desserialización de Dolencias y Citas
+                dolencias=[Dolencia.a_objeto(dic) for dic in datos["dolencias"]],
+                citas=[Cita.a_objeto(dic) for dic in datos["citas"]],
+            )
             return cliente
-                 
-        except(FileNotFoundError, ValueError, KeyError, json.JSONDecodeError):
-            #El archivo no existe o está dañado
+
+        except (
+            FileNotFoundError,
+            TypeError,
+            ValueError,
+            KeyError,
+            json.JSONDecodeError,
+        ):
+            # El archivo no existe o está dañado
             return None
 
     # NOTA: este método recorre los archivos JSON para listar a los clientes.
@@ -62,16 +68,15 @@ class RepositorioClientes:
                     datos = json.load(file)
                 clientes.append(
                     {
-                    "id_cliente": datos["id_cliente"],
-                    "nombre": datos["nombre"],
+                        "id_cliente": datos["id_cliente"],
+                        "nombre": datos["nombre"],
                     }
-                    )
-            except (json.JSONDecodeError, ValueError, KeyError):
+                )
+            except (json.JSONDecodeError, TypeError, ValueError, KeyError):
                 continue
         return clientes
-        
 
     def existe_cliente(self, id_cliente):
-        '''Devuelve True si ya hay un cliente con dicho ID'''
+        """Devuelve True si ya hay un cliente con dicho ID"""
         nombre_archivo = f"{self.carpeta}/Cliente_{id_cliente}.json"
-        return Path(nombre_archivo).exists() # ¿hay un archivo real en esa ruta?
+        return Path(nombre_archivo).exists()  # ¿hay un archivo real en esa ruta?
