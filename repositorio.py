@@ -4,12 +4,51 @@ from modelos import Cliente, Cita, Dolencia
 # Importamos módulos
 import json
 from pathlib import Path
+import sqlite3
 
 
 class RepositorioClientes:
     def __init__(self, carpeta="."):  # carpeta actual
         self.carpeta = carpeta
         Path(self.carpeta).mkdir(exist_ok=True)  # crea la carpeta si no existe
+        ruta_bd = Path(self.carpeta) / "clientes.db"
+        #Construir la ruta y conectar
+        self.conexion = sqlite3.connect(ruta_bd)
+        self.conexion.execute('PRAGMA foreign_keys = ON')
+        self.conexion.executescript("""
+            CREATE TABLE IF NOT EXISTS clientes(
+	            id INTEGER PRIMARY KEY,
+	            nombre TEXT NOT NULL,
+	            nacimiento TEXT)
+            ;
+
+            CREATE TABLE IF NOT EXISTS dolencias(
+                id INTEGER PRIMARY KEY,
+                cliente_id INTEGER NOT NULL,
+                descripcion TEXT,
+                inicio TEXT,
+                estado TEXT,
+                resolucion TEXT,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS citas(
+                id INTEGER PRIMARY KEY,
+                cliente_id INTEGER NOT NULL,
+                fecha_cita TEXT NOT NULL,
+                anotacion TEXT,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS observaciones(
+                id INTEGER PRIMARY KEY,
+                dolencia_id INTEGER NOT NULL,
+                fecha TEXT NOT NULL,
+                texto TEXT,
+                FOREIGN KEY (dolencia_id) REFERENCES dolencias(id)
+            );
+                    
+            """)
 
     def guardar(self, cliente: Cliente):
         """Guarda los datos del cliente en un archivo JSON"""
@@ -80,3 +119,8 @@ class RepositorioClientes:
         """Devuelve True si ya hay un cliente con dicho ID"""
         nombre_archivo = f"{self.carpeta}/Cliente_{id_cliente}.json"
         return Path(nombre_archivo).exists()  # ¿hay un archivo real en esa ruta?
+
+
+# 1. CONECTAR (crea el fichero si no existe)
+conexion = sqlite3.connect('demo.db')
+conexion.execute('PRAGMA foreign_keys = ON')
