@@ -66,6 +66,24 @@ class RepositorioClientes:
         with open(nombre_archivo, "w", encoding="utf-8") as file:
             json.dump(datos, file, ensure_ascii=False, indent=4)
 
+        cliente_id = self.conexion.execute("INSERT INTO clientes(nombre, nacimiento) VALUES (?, ?)",
+                              (cliente.nombre, cliente.nacimiento.strftime("%Y-%m-%d"))).lastrowid
+        #lastrowid --> Devuelve el id que se ha creado automáticamente
+
+        for dolencia in cliente.dolencias:
+            dolencia_id = self.conexion.execute("INSERT INTO dolencias(cliente_id, descripcion, inicio, estado, resolucion) VALUES (?,?,?,?,?)",
+            (cliente_id, dolencia.descripcion, dolencia.inicio.strftime("%Y-%m-%d"), dolencia.estado, dolencia.resolucion)).lastrowid
+            for obs in dolencia.observaciones:
+                self.conexion.execute("INSERT INTO observaciones(dolencia_id, fecha, texto) VALUES (?,?,?)",
+                                      (dolencia_id, obs["fecha"], obs["texto"]))
+        
+        for cita in cliente.citas:
+            self.conexion.execute("INSERT INTO citas(cliente_id, fecha_cita, anotacion) VALUES (?, ?, ?)",
+                                  (cliente_id, cita.fecha_cita.strftime("%Y-%m-%d"), cita.anotacion))
+
+        
+        self.conexion.commit()
+
     def cargar(self, id_cliente):
         """Carga un cliente desde el JSON y reconstruye el objeto"""
         nombre_archivo = f"{self.carpeta}/Cliente_{id_cliente}.json"
@@ -121,6 +139,3 @@ class RepositorioClientes:
         return Path(nombre_archivo).exists()  # ¿hay un archivo real en esa ruta?
 
 
-# 1. CONECTAR (crea el fichero si no existe)
-conexion = sqlite3.connect('demo.db')
-conexion.execute('PRAGMA foreign_keys = ON')
