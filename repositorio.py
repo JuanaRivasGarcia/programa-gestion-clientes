@@ -51,39 +51,35 @@ class RepositorioClientes:
             """)
 
     def guardar(self, cliente: Cliente):
-        """Guarda los datos del cliente en un archivo JSON"""
-        datos = {
-            "id_cliente": cliente.id_cliente,
-            "nombre": cliente.nombre,
-            # nacimiento lo convertimos a str para poder guardarlo en json
-            "nacimiento": cliente.nacimiento.strftime("%d/%m/%Y"),
-            # Serialización de Dolencias y Citas
-            "dolencias": [dolencia.a_diccionario() for dolencia in cliente.dolencias],
-            "citas": [cita.a_diccionario() for cita in cliente.citas],
-        }
-
-        nombre_archivo = f"{self.carpeta}/Cliente_{cliente.id_cliente}.json"
-        with open(nombre_archivo, "w", encoding="utf-8") as file:
-            json.dump(datos, file, ensure_ascii=False, indent=4)
-
-        cliente_id = self.conexion.execute("INSERT INTO clientes(nombre, nacimiento) VALUES (?, ?)",
-                              (cliente.nombre, cliente.nacimiento.strftime("%Y-%m-%d"))).lastrowid
+        """Guarda los datos del cliente en la base de datos"""
+        cliente_id = self._insertar_cliente(cliente)
+        self._guardar_dolencias(cliente_id, cliente.dolencias)
+        self._guardar_citas(cliente_id, cliente.citas)
+        self.conexion.commit()
+        
+    def _insertar_cliente(self, cliente):
+        return self.conexion.execute("INSERT INTO clientes(nombre, nacimiento) VALUES (?, ?)",
+            (cliente.nombre, cliente.nacimiento.strftime("%Y-%m-%d"))).lastrowid
         #lastrowid --> Devuelve el id que se ha creado automáticamente
 
-        for dolencia in cliente.dolencias:
+    def _guardar_dolencias(self, cliente_id, dolencias):
+        for dolencia in dolencias:
             dolencia_id = self.conexion.execute("INSERT INTO dolencias(cliente_id, descripcion, inicio, estado, resolucion) VALUES (?,?,?,?,?)",
             (cliente_id, dolencia.descripcion, dolencia.inicio.strftime("%Y-%m-%d"), dolencia.estado, dolencia.resolucion)).lastrowid
-            for obs in dolencia.observaciones:
-                self.conexion.execute("INSERT INTO observaciones(dolencia_id, fecha, texto) VALUES (?,?,?)",
-                                      (dolencia_id, obs["fecha"], obs["texto"]))
-        
-        for cita in cliente.citas:
+            self._guardar_observaciones(dolencia_id, dolencia.observaciones)
+
+    def _guardar_observaciones(self, dolencia_id, observaciones):
+        for obs in observaciones:
+            self.conexion.execute("INSERT INTO observaciones(dolencia_id, fecha, texto) VALUES (?,?,?)",
+            (dolencia_id, obs["fecha"], obs["texto"]))
+            
+
+    def _guardar_citas(self, cliente_id, citas):
+        for cita in citas:
             self.conexion.execute("INSERT INTO citas(cliente_id, fecha_cita, anotacion) VALUES (?, ?, ?)",
-                                  (cliente_id, cita.fecha_cita.strftime("%Y-%m-%d"), cita.anotacion))
+            (cliente_id, cita.fecha_cita.strftime("%Y-%m-%d"), cita.anotacion))
 
-        
-        self.conexion.commit()
-
+                     
     def cargar(self, id_cliente):
         """Carga un cliente desde el JSON y reconstruye el objeto"""
         nombre_archivo = f"{self.carpeta}/Cliente_{id_cliente}.json"
